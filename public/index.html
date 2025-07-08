@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Status setzen</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        transition: background 0.3s;
+        font-family: sans-serif;
+      }
+      #status-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0 0 0; /* Abstand oben reduziert, unten entfernt */
+        justify-content: center;
+      }
+      .status-btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #fff;
+        min-width: 120px;
+        transition: transform 0.1s;
+      }
+      .status-btn:active {
+        transform: scale(0.97);
+      }
+      #current-status {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem; /* Weniger Abstand nach unten */
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #222;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+      }
+      @media (max-width: 600px) {
+        #status-buttons {
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+        .status-btn {
+          width: 100%;
+          min-width: unset;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="current-status"></div>
+    <div id="status-buttons"></div>
+    <script>
+      let statusList = [];
+      let currentStatus = null;
+
+      function getApiUrl() {
+        if (
+          location.hostname === "localhost" ||
+          location.hostname == "127.0.0.1"
+        ) {
+          return "http://localhost:7071/api/status";
+        }
+        return "/api/status";
+      }
+
+      async function fetchStatusList() {
+        const res = await fetch("data/status.json");
+        statusList = await res.json();
+      }
+
+      // Hilfsfunktion: Farbe abdunkeln (factor 0.7 = 30% dunkler)
+      function darkenColor(hex, factor = 0.7, status = null) {
+        // Spezieller Fall für Offline: immer ein mittleres Grau
+        if (
+          (status && status.toLowerCase() === "offline") ||
+          hex.toLowerCase() === "#000000"
+        ) {
+          return "#171717"; // oder z.B. "#333" für ein mittleres Grau
+        }
+        let c = hex.replace("#", "");
+        if (c.length === 3)
+          c = c
+            .split("")
+            .map((x) => x + x)
+            .join("");
+        const num = parseInt(c, 16);
+        let r = Math.floor(((num >> 16) & 255) * factor);
+        let g = Math.floor(((num >> 8) & 255) * factor);
+        let b = Math.floor((num & 255) * factor);
+        return `rgb(${r},${g},${b})`;
+      }
+
+      // Hilfsfunktion: Schwarz oder Weiß für gute Lesbarkeit
+      function getContrastYIQ(hexcolor) {
+        let c = hexcolor.replace("#", "");
+        if (c.length === 3)
+          c = c
+            .split("")
+            .map((x) => x + x)
+            .join("");
+        const r = parseInt(c.substr(0, 2), 16);
+        const g = parseInt(c.substr(2, 2), 16);
+        const b = parseInt(c.substr(4, 2), 16);
+        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq >= 128 ? "#000" : "#fff";
+      }
+
+      function renderButtons() {
+        const container = document.getElementById("status-buttons");
+        container.innerHTML = "";
+        statusList.forEach((statusObj) => {
+          const btn = document.createElement("button");
+          btn.className = "status-btn";
+          btn.textContent = statusObj.status;
+          btn.style.background = statusObj.color;
+          btn.style.color = getContrastYIQ(statusObj.color);
+          btn.onclick = () => setStatus(statusObj.status);
+          container.appendChild(btn);
+        });
+      }
+
+      async function fetchCurrentStatus() {
+        const url = getApiUrl();
+        console.log("fetchCurrentStatus: GET", url);
+        try {
+          const res = await fetch(url);
+          console.log("fetchCurrentStatus: response", res);
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          currentStatus = data.status;
+          document.body.style.background = darkenColor(
+            data.color,
+            0.7,
+            data.status
+          );
+          document.getElementById("current-status").textContent =
+            "Aktueller Status: " + data.status;
+        } catch (e) {
+          console.error("fetchCurrentStatus: error", e);
+          document.body.style.background = "#fff";
+          document.getElementById("current-status").textContent =
+            "Kein Status gesetzt";
+        }
+      }
+
+      async function setStatus(status) {
+        const url = getApiUrl();
+        console.log("setStatus: POST", url, status);
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          });
+          console.log("setStatus: response", res);
+        } catch (e) {
+          console.error("setStatus: error", e);
+        }
+        await fetchCurrentStatus();
+      }
+
+      async function init() {
+        await fetchStatusList();
+        renderButtons();
+        await fetchCurrentStatus();
+      }
+
+      window.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

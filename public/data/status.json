@@ -1,0 +1,32 @@
+[
+  {
+    "status": "Available",
+    "color": "#00FF00",
+    "default": false
+  },
+  {
+    "status": "Busy",
+    "color": "#FF0000",
+    "default": false
+  },
+  {
+    "status": "Away",
+    "color": "#FFFF00",
+    "default": false
+  },
+  {
+    "status": "Offline",
+    "color": "#000000",
+    "default": true
+  },
+  {
+    "status": "No Disturb",
+    "color": "#FF00FF",
+    "default": false
+  },
+  {
+    "status": "Come in",
+    "color": "#0000FF",
+    "default": false
+  }
+]
