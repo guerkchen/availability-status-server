@@ -45,7 +45,28 @@ module.exports = async function (context, req) {
 
             if (isExpired(savedTime, 6)) {
                 await client.deleteEntity(partitionKey, rowKey);
-                context.res = { status: 200, body: { status: "Expired", color: "#808080" } };
+
+                // Default-Status aus Statusliste holen
+                const statusHelpers = require("../statusHelpers");
+                const statusList = await statusHelpers.loadStatusList();
+                const defaultStatus = statusList.find(s => s.default) || { status: "Expired", color: "#808080" };
+
+                // Default-Status als neuen Eintrag speichern
+                const newEntity = {
+                    partitionKey,
+                    rowKey,
+                    status: defaultStatus.status,
+                    timestamp: new Date().toISOString()
+                };
+                await client.upsertEntity(newEntity, "Replace");
+
+                context.res = {
+                    status: 200,
+                    body: {
+                        status: defaultStatus.status,
+                        color: defaultStatus.color
+                    }
+                };
                 return;
             }
 

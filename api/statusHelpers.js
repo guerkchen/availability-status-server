@@ -31,4 +31,4 @@ function isExpired(timestamp, maxHours) {
     return diffHours > maxHours;
 }
 
-module.exports = { getColorForStatus, isStatusValid, isExpired };
+module.exports = { getColorForStatus, isStatusValid, isExpired, loadStatusList };
