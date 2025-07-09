@@ -2,31 +2,37 @@
   {
     "status": "Available",
     "color": "#00FF00",
-    "default": false
+    "default": false,
+    "emoji": "🟢"
   },
   {
     "status": "Busy",
     "color": "#FF0000",
-    "default": false
+    "default": false,
+    "emoji": "🔴"
   },
   {
     "status": "Away",
     "color": "#FFFF00",
-    "default": false
+    "default": false,
+    "emoji": "🟡"
   },
   {
     "status": "Offline",
     "color": "#000000",
-    "default": true
+    "default": true,
+    "emoji": "⚫"
   },
   {
     "status": "No Disturb",
     "color": "#FF00FF",
-    "default": false
+    "default": false,
+    "emoji": "🚫"
   },
   {
     "status": "Come in",
     "color": "#0000FF",
-    "default": false
+    "default": false,
+    "emoji": "🔵"
   }
 ]

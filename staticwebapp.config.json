@@ -2,7 +2,9 @@
   "routes": [
     {
       "route": "/api/status",
-      "allowedRoles": ["anonymous"]
+      "allowedRoles": [
+        "anonymous"
+      ]
     }
   ]
 }
