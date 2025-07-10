@@ -1,3 +1,5 @@
 .env
 local.settings.json
 node_modules
+tmp/
+.vscode

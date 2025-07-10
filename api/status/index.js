@@ -1,6 +1,7 @@
 // Importieren der benötigten Module
+const axios = require('axios');
 const { TableClient } = require("@azure/data-tables");
-const { isStatusValid, isExpired, loadStatusList } = require("../statusHelpers");
+const { isStatusValid, isExpired, getDefaultStatus, loadStatusList } = require("../statusHelpers");
 
 // Konfiguration der Tabelle und Verbindung
 const tableName = "StatusTable"; // Name der Azure-Tabelle
@@ -27,6 +28,11 @@ async function handlePostRequest(client, context, req) {
     // Speichern des Status in der Tabelle
     await client.upsertEntity(entity, "Replace");
     context.res = { status: 200, body: { message: "Status gespeichert." } }; // Erfolgsantwort
+
+    // Push an /light, dass es ein Auto-Update macht
+    const lightURL = process.env.AZURE_FUNCTION_URL + "/light";
+    console.log("Triggering light update at:", lightURL);
+    axios.post(lightURL); // Es wird auf keine Antwort gewartet, da es nur ein Trigger ist
 }
 
 // Funktion zur Verarbeitung von GET-Anfragen

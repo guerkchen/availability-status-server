@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const axios = require('axios');
 
 let statusList = null;
@@ -8,6 +6,7 @@ async function loadStatusList() {
     if (!statusList) {
         const appUrl = process.env.APP_URL;
         try {
+            console.log("Lade Statusliste von:", appUrl + '/data/status.json');
             const statusListResponse = await axios.get(appUrl + '/data/status.json');
             statusList = statusListResponse.data;
         } catch (error) {
@@ -44,4 +43,4 @@ function clearStatusList() {
     statusList = null;
 }
 
-module.exports = { isStatusValid, isExpired, clearStatusList, setDefaultStatus: getDefaultStatus };
+module.exports = { isStatusValid, isExpired, clearStatusList, getDefaultStatus, loadStatusList };
