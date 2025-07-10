@@ -4,10 +4,10 @@ let statusList = null;
 
 async function loadStatusList() {
     if (!statusList) {
-        const appUrl = process.env.APP_URL;
         try {
-            console.log("Lade Statusliste von:", appUrl + '/data/status.json');
-            const statusListResponse = await axios.get(appUrl + '/data/status.json');
+            const url = process.env.HOMEPAGE_URL + '/data/status.json';
+            console.log("Lade Statusliste von:", url);
+            const statusListResponse = await axios.get(url);
             statusList = statusListResponse.data;
         } catch (error) {
             console.error("Fehler beim Laden der Statusliste:", error);

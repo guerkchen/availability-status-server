@@ -30,9 +30,14 @@ async function handlePostRequest(client, context, req) {
     context.res = { status: 200, body: { message: "Status gespeichert." } }; // Erfolgsantwort
 
     // Push an /light, dass es ein Auto-Update macht
-    const lightURL = process.env.AZURE_FUNCTION_URL + "/light";
-    console.log("Triggering light update at:", lightURL);
-    axios.post(lightURL); // Es wird auf keine Antwort gewartet, da es nur ein Trigger ist
+    try {
+        const lightURL = process.env.LIGHT_API_URL + "/light";
+        console.log("Triggering light update at:", lightURL);
+        axios.post(lightURL); // Es wird auf keine Antwort gewartet, da es nur ein Trigger ist
+    } catch (error) {
+        console.error("Fehler beim Triggern des Licht-Updates:", error);
+    }
+
 }
 
 // Funktion zur Verarbeitung von GET-Anfragen
