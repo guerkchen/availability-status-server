@@ -37,7 +37,6 @@ async function handlePostRequest(client, context, req) {
     } catch (error) {
         console.error("Fehler beim Triggern des Licht-Updates:", error);
     }
-
 }
 
 // Funktion zur Verarbeitung von GET-Anfragen
